@@ -38,8 +38,14 @@ func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	randStr := randomString(8)
-	fmt.Println("Created work dir " + randStr)
+	if _, err := os.Stat("/tmp/io-rw-app/"); os.IsNotExist(err) {
+		err := os.Mkdir("/tmp/io-rw-app/", 0755)
+		if err != nil {
+			fmt.Println("error creating directory: ", err)
+		}
+	}
 	createFile("/tmp/io-rw-app/" + randStr + "/")
+	fmt.Println("Created work dir " + randStr)
 
 	buf := make([]byte, 1024)
 	_, err := conn.Read(buf)
