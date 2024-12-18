@@ -10,6 +10,8 @@ import (
 
 )
 
+var workUnits []string
+
 func main() {
 	listenSocket("/tmp/io-rw-app.sock")
 }
@@ -45,6 +47,7 @@ func handleConnection(conn net.Conn) {
 		}
 	}
 	createFile("/tmp/io-rw-app/" + randStr + "/")
+	workUnits = append(workUnits, randStr)
 	fmt.Println("Created work dir " + randStr)
 
 	buf := make([]byte, 1024)
