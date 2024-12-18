@@ -5,15 +5,34 @@ import (
 	"fmt"
 	"math/big"
 	"net"
+	"net/http"
 	"os"
 	"path/filepath"
-
+	"runtime/pprof"
+	_ "net/http/pprof"
 )
 
 var workUnits []string
 
 func main() {
+	profileMem()
 	listenSocket("/tmp/io-rw-app.sock")
+}
+
+func profileMem() {
+	f, err := os.Create("memProfile.pprof")
+	if err != nil {
+		fmt.Println("error creating memProfile.pprof file: ", err)
+	}
+	defer f.Close()
+
+	if err := pprof.WriteHeapProfile(f); err != nil {
+		fmt.Println("error writing heap profile: ", err)
+	}
+
+	go func() {
+		fmt.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 }
 
 func listenSocket(socketPath string) {
