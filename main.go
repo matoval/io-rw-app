@@ -5,34 +5,45 @@ import (
 	"fmt"
 	"math/big"
 	"net"
-	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
-	"runtime/pprof"
-	_ "net/http/pprof"
+	"time"
+
+	_ "github.com/grafana/pyroscope-go/godeltaprof/http/pprof"
 )
 
 var workUnits []string
 
 func main() {
-	profileMem()
+	go writeToSocket("/tmp/io-rw-app.sock")
 	listenSocket("/tmp/io-rw-app.sock")
 }
 
-func profileMem() {
-	f, err := os.Create("memProfile.pprof")
+func writeToSocket(socketPath string) {
+	time.Sleep(2 * time.Second)
+	// Connect to the socket
+	for {
+		conn, err := net.Dial("unix", socketPath)
+		if err != nil {
+			fmt.Println("Error connecting to socket:", err)
+			os.Exit(1)
+		}
+		go sendLongMessage(conn)
+	}
+}
+
+func sendLongMessage(conn net.Conn){
+	// Send a message
+	message := randomString(99999)
+	time.Sleep(1 * time.Second)
+	_, err := conn.Write([]byte(message))
 	if err != nil {
-		fmt.Println("error creating memProfile.pprof file: ", err)
+		fmt.Println("Error writing to socket:", err)
+		os.Exit(1)
 	}
-	defer f.Close()
-
-	if err := pprof.WriteHeapProfile(f); err != nil {
-		fmt.Println("error writing heap profile: ", err)
-	}
-
-	go func() {
-		fmt.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
+	fmt.Println("Message sent successfully")
+	conn.Close()
 }
 
 func listenSocket(socketPath string) {
