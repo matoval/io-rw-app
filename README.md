@@ -1,5 +1,11 @@
 ## Using application
+Run Pyroscope with Docker: `docker run -p 4040:4040 grafana/pyroscope`
+
 Run:`go run main`
+
+Once the application is running you can navigate to http://localhost:4040
+
+### Debugging:
 
 The app will listen to unix socket at: `/tmp/io-rw-app.sock`
 
