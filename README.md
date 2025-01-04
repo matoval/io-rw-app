@@ -3,7 +3,7 @@ Run Pyroscope with Docker: `docker run -p 4040:4040 grafana/pyroscope`
 
 Run:`go run main`
 
-Once the application is running you can navigate to http://localhost:4040
+Once the application is running you can navigate to http://localhost:4040 and selet the tag `test` in simple.golang.app application in the pyroscope UI
 
 ### Debugging:
 
