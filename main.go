@@ -1,14 +1,16 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"math/big"
 	"net"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"time"
-	_ "net/http/pprof"
+
 	"github.com/grafana/pyroscope-go"
 )
 
@@ -40,8 +42,10 @@ func main() {
 				pyroscope.ProfileBlockDuration,
 		},
 	})
+	pyroscope.TagWrapper(context.Background(), pyroscope.Labels("test", "write_to_socket"), func(c context.Context) {
+		go writeToSocket("/tmp/io-rw-app.sock")
+	})
 
-	go writeToSocket("/tmp/io-rw-app.sock")
 	listenSocket("/tmp/io-rw-app.sock")
 }
 
