@@ -5,17 +5,42 @@ import (
 	"fmt"
 	"math/big"
 	"net"
-	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"time"
-
-	_ "github.com/grafana/pyroscope-go/godeltaprof/http/pprof"
+	_ "net/http/pprof"
+	"github.com/grafana/pyroscope-go"
 )
 
 var workUnits []string
 
 func main() {
+	pyroscope.Start(pyroscope.Config {
+		ApplicationName: "simple.golang.app",
+
+		// replace this with the address of pyroscope server
+		ServerAddress: "http://localhost:4040",
+
+		// you can disable logging by setting this to nil
+		Logger: pyroscope.StandardLogger,
+
+		ProfileTypes: [] pyroscope.ProfileType {
+			// these profile types are enabled by default:
+			pyroscope.ProfileCPU,
+				pyroscope.ProfileAllocObjects,
+				pyroscope.ProfileAllocSpace,
+				pyroscope.ProfileInuseObjects,
+				pyroscope.ProfileInuseSpace,
+
+				// these profile types are optional:
+				pyroscope.ProfileGoroutines,
+				pyroscope.ProfileMutexCount,
+				pyroscope.ProfileMutexDuration,
+				pyroscope.ProfileBlockCount,
+				pyroscope.ProfileBlockDuration,
+		},
+	})
+
 	go writeToSocket("/tmp/io-rw-app.sock")
 	listenSocket("/tmp/io-rw-app.sock")
 }
