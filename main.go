@@ -18,7 +18,7 @@ var workUnits []string
 
 func main() {
 	pyroscope.Start(pyroscope.Config {
-		ApplicationName: "simple.golang.app",
+		ApplicationName: "io-rw-app",
 
 		// replace this with the address of pyroscope server
 		ServerAddress: "http://localhost:4040",
